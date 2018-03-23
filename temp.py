@@ -1,25 +1,39 @@
-from __future__ import absolute_import, division, print_function
-from toolz import memoize
-from .drop import drop
-from .utils import copydoc
+import os
+from bs4 import BeautifulSoup
+
+folder = '/Users/nt/Desktop/Darwin'
+files = os.listdir(folder)
+tagnames = ['keywords']
+
+files = [f for f in files[:] if 'xml' in f]
+
+output_strs = []
+
+for fname in files:
+    with open(os.path.join(folder, fname), "r") as infile:
+        file_data = []
+        content = infile.read()
+        soup = BeautifulSoup(content,'xml')
+
+        for tagname in tagnames:
+            tag_data = soup.find(tagname)
+            if tag_data is None:
+                tag_text="MISSING"
+            else:
+                transcription = soup.find(type="scientific_terms")
+                temp = tag_data.get_text()
+                if transcription is not None:
+                    tag_text="scientific"
+                else:
+                    tag_text = tag_data.get_text()
+                    if tag_text is not soup.find(type="scientific_terms"):
+                        tag_text="not scientific"
+
+            file_data.append(',\"' + tag_text + '\"')
+
+        output_strs.append("{}\t{}\n".format(fname, "\t".join(file_data).replace('\n', ' ')))
 
 
-class _Temp(object):
-    """ Temporary version of persistent storage
-
-    Calls ``drop`` on object at garbage collection
-
-    This is a parametrized type, so call it on types to make new types
-
-    >>> from odo import Temp, CSV
-    >>> csv = Temp(CSV)('/tmp/myfile.csv', delimiter=',')
-    """
-    def __del__(self):
-        drop(self)
-
-
-@memoize
-@copydoc(_Temp)
-def Temp(cls):
-    """ Parametrized Chunks Class """
-    return type('Temp(%s)' % cls.__name__, (_Temp, cls), {'persistent_type': cls})
+print(len(output_strs))
+with open('/Users/nt/Desktop/keywords.csv', 'w+') as outfile:
+    outfile.writelines(output_strs)
