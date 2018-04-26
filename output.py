@@ -24,7 +24,7 @@ outfile = open('/Users/nt/Documents/Darwin_project/output/dar.csv', 'w+')
 output_writer = csv.writer(outfile, delimiter = "\t")
 
 # Write header row:
-output_writer.writerow(["Letter_id", "Date_sent", "Sender", "Darwin", "Receiver", "Keywords"]) # TO DO: add more fields
+output_writer.writerow(["Letter_id", "Date_sent", "Sender", "Receiver", "keywords", "abstract", "letter_text"]) # TO DO: add more fields
 
 # Open each file:
 for fname in files:
@@ -43,50 +43,51 @@ for fname in files:
         scientific_terms = []
         abstract = "" # summary of the letter
         letter_text = "" # transcription of the letter
-        Darwin = ""
         
         # Parse the XML of the file:
         soup = BeautifulSoup(content,'xml')
         
         # Extract sender, receiver, and date sent of the letter:
 
-    try:
-        corr_action = soup.find_all("correspAction")
+        try:
+            corr_action = soup.find_all("correspAction")
         #print("sender_receiver=",sender_receiver) 
-        for s in corr_action:
+            for s in corr_action:
             
-            if s.get('type') == "sent":
-                sender = s.persName.get_text()  
-                print("sender:", sender)
-                for sender in s.persName:
-                    tag_data = soup.find(sender)
-                    if tag_data is "Darwin C. R.":
-                        print("Darwin:", "yes")
-                
-                
+                if s.get('type') == "sent":
+                    sender = s.persName.get_text()  
+                    print("sender:", sender)
+                    for sender in s.persName:
+                        tag_data = soup.find(sender)
+                        if tag_data is "Darwin C. R.":
+                            print("Darwin:", "yes")
+                              
                     
-                date_sent = s.date["when"]    
-                print("date sent:", date_sent)
-                if date_sent is None:
-                    print("MISSING")
+                    date_sent = s.date["when"]    
+                    print("date sent:", date_sent)
+                    if date_sent is None:
+                        print("MISSING")
                 
                 
-            elif s.get('type') == "received":
-                receiver = s.persName.get_text()
-                print("receiver:", receiver)
-                if receiver is None:
-                    print("MISSING")
+                elif s.get('type') == "received":
+                    receiver = s.persName.get_text()
+                    print("receiver:", receiver)
+                    if receiver is None:
+                        print("MISSING")
                 
-        keywords = soup.find_all("keywords")
-        for s in keywords:
+            abstr = soup.find_all("abstract")
+            for s in abstr:
+                abstract = s.abstract.get_text()
+                print("abstract:", abstract)
+                
+            let = soup.find_all("transcription")
+            for s in let:
+                letter_text = s.transcription.get_text()
+                print("letter_text:", letter_text)
+        
             
-            if s.get('type') == "scientific":
-
-                scientific = s.scientific.get_text()
-                print ("scientific:", scientific)
-         
-        output_writer.writerow([fname, date_sent, sender, Darwin, receiver, keywords])
-    except:
+        output_writer.writerow([fname, date_sent, sender, receiver, keywords, abstract, letter_text])
+        except:
             print("missing")
             
 print(len(output_strs))

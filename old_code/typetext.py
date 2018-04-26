@@ -3,9 +3,9 @@ from bs4 import BeautifulSoup
 
 folder = '/Users/nt/Desktop/Darwin'
 files = os.listdir(folder)
-tagnames = ['keywords']
+tagnames = ['persName', 'date', 'keywords', 'abstract', 'text']
 
-files = [f for f in files[:] if 'xml' in f]
+files = [f for f in files[:20] if 'xml' in f]
 
 output_strs = []
 
@@ -20,20 +20,22 @@ for fname in files:
             if tag_data is None:
                 tag_text="MISSING"
             else:
-                transcription = soup.find(type="scientific_terms")
-                temp = tag_data.get_text()
+                transcription = soup.find(type="transcription")
                 if transcription is not None:
-                    tag_text="scientific"
+                    tag_text = transcription.get_text()
                 else:
                     tag_text = tag_data.get_text()
-                    if tag_text is not soup.find(type="scientific_terms"):
-                        tag_text="not scientific"
+                    if tag_text is "":
+                        tag_text="TRANSCRIPTION MISSING"
 
-            file_data.append(',\"' + tag_text + '\"')
+            file_data.append(",\"" + tag_text + "\"")
+
+
 
         output_strs.append("{}\t{}\n".format(fname, "\t".join(file_data).replace('\n', ' ')))
 
 
 print(len(output_strs))
-with open('/Users/nt/Desktop/keywords.csv', 'w+') as outfile:
+with open('/Users/nt/Desktop/text2.csv', 'w') as outfile:
     outfile.writelines(output_strs)
+print('yo dude im finito')
