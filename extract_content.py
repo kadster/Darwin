@@ -21,7 +21,7 @@ files = [f for f in files [:] if 'xml' in f]
 output_strs = []
 
 # Open output file:
-outfile = open('/Users/nt/Documents/Darwin_project/output/notafter.txt', 'w+')
+outfile = open('/Users/nt/Documents/Darwin_project/output/all_fields.txt', 'w+')
 output_writer = csv.writer(outfile, delimiter = "\t")
 
 # Write header row:
@@ -43,18 +43,18 @@ for fname in files:
         keywords = "" # list of all keywords in the letter
         scientific_terms = []
         abstract = "" # summary of the letter
-        letter_text = [] # transcription of the letter
+        letter_text = "" # transcription of the letter
         
         # Parse the XML of the file:
         soup = BeautifulSoup(content,'xml')
         
         # Extract sender, receiver, and date sent of the letter:
-        #transcription = soup.find(type="transcription")
+        transcription = soup.find(type="transcription")
         
         
-        #if transcription is not None:
-         #  letter_text = transcription.get_text(separator=" ", strip=True)
-         #  print("letter_text:", letter_text)
+        if transcription is not None:
+            letter_text = transcription.get_text(separator=" ", strip=True)
+            print("letter_text:", letter_text)
                         
              
         try:
@@ -68,12 +68,8 @@ for fname in files:
                     print("sender:", sender)
                     for sender in s.persName:
                         tag_data = soup.find(sender)
-                        date_sent = s.date["notAfter"]    
+                        date_sent = s.date["when"]    
                         print("date sent:", date_sent)
-                        
-                        
-                        
-                    
         
                 
                 elif s.get('type') == "received":
