@@ -8,6 +8,7 @@ Created on Thu Apr 26 12:00:58 2018
 #import modules
 from nltk.tokenize import sent_tokenize, word_tokenize
 import csv
+from scipy import spatial
 
 #define parameters
 target_word="evolution"
@@ -16,10 +17,23 @@ time_period_2=[1859,1882]
 win_size= 2
 #context words occurring with target word go beyond sentence boundary
 beyond_sentence_boundary="yes"
+#lemmatize yes or no
+lemmatize="no"
 
 #define vocabulary
 
 vocabulary=[]
+
+#to do: define context words of target one in time_period_1 & 2
+context_words_t1=[] #list of all context words of target word in t1
+context_words_t2=[] #list of all context words of target word in t2
+context_word_freq_t1=dict() #frequency of context word in t1 
+context_word_freq_t2=dict() #frequency of context word in t2
+
+#initialize word vector for target word in t1 and t2
+target_word_t1=[]
+target_word_t2=[]
+
 
 #define file names
 
@@ -51,20 +65,40 @@ for row in input_reader:
             
             if beyond_sentence_boundary == "yes":
                 #tokenize letter_text
+                if lemmatize == "no":
                 
-                tokens =word_tokenize(letter_text)
-                print("tokens", str(tokens))
-                #extract target word from the letters
+                    tokens = word_tokenize(letter_text)
+                    print("tokens", str(tokens))
+                    #extract target word from the letters
             
-                #to do: loop over the list of tokens by index and find the index of the target word
-                #to do: define the range for the left and right context of the target word
-                
-            
-#extract the vocabulary from the corpus
+                    #to do: loop over the list of tokens by index and find the index of the target word
+                    #to do: define the range for the left and right context of the target word
+                    #to do: extract all words in the left and right context of the target word
+                    #to do: add these words to the vocabulary list
+                    #to do: check the date of the letter (date_sent) and see whether it is contained in t1 or t2
+                    #to do: if the date of the letter is contained in t1 then add context words to the list context_word_t1 and if it's in t2 , do the same thing
+                    #to do: if the date of the letter is contained in t1, for every context word define the dictionary context_word_freq_t1 with key as the context word and value as the frequency
+                        #if 'nature' is a context word then do context_word_freq_t1['nature']=1
+                        #for now all frequencies will be 1, next time discuss how to deal with frequencies greater than 1
+                    
 
+#extract word vectors for target word in t1 and t2       
+for word in vocabulary:
+   if word in context_words_t1:
+       target_word_t1.append(context_word_freq_t1[word])
+   elif word in context_words_t2:
+       target_word_t2.append(context_word_freq_t2[word])   
 
+#calculate cosine distance between word vectors for t1 and t2
 
-#extract word vectors for target word in t1 and t2            
+cosine_distance = 1 - spatial.distance.cosine(target_word_t1, target_word_t2)     
+print('cosine_distance', str(cosine_distance))
+             
+                        
+                        
+                        
+                        
+                        
 #            
 #            all_sentences.append(sentences)
 #print(all_sentences)
