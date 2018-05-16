@@ -126,7 +126,7 @@ for row in input_reader:
                          #to do: extract all words in the left and right context of the target word
                          #to do: add these words to the vocabulary list 
                     vocabulary=((vocabulary[index_target_word-win_size+1:index_target_word]),vocabulary[index_target_word+1:index_target_word+win_size])
-                    print(vocabulary)
+                    #print(vocabulary)
                     
                     print("Letter_ID:", fname)
                     print("context words:", vocabulary)
@@ -139,7 +139,7 @@ for row in input_reader:
                                     #range(1823, 1858)
                         print("t1:", "yes")
                         context_words_t1.append(target_word)
-                        print(context_words_t1)
+                        print("context_word_t1:",context_words_t1)
                     else: print("t1:", "no")
 
                         
