@@ -7,21 +7,27 @@ Created on Thu Apr 26 12:00:58 2018
 """
 #import modules
 from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 import csv
 from scipy import spatial
+#import re
 #import pandas as pd
 #pd.interval_range(start='1823-01-01', end='1858-01-01')
 #time_period_1= pd.interval_range#
 #print(time_period_1)
 #data = pd.date_range([0, 1, 2, 3], index=index)
-#print(data)
+#print(data)       
 
 #define parameters
 target_word="brain"
 #define time intervals
-time_period_1=[1823,1858]
-time_period_2=[1859,1882]
+#date_t1_1=1823
+#date_t1_2=1858
+
+time_period_1=list(range(1823,1858))
+time_period_2=list(range(1859,1882))
+
 #define window size
 win_size= 3
 #context words occurring with target word go beyond sentence boundary
@@ -44,9 +50,9 @@ target_word_t2=[]
 Transcription='/Users/nt/Documents/Darwin_project/output/all_fields_10.txt'
 # All the strings for output:
 Letter_ID =""                    
-date=""
-time_period_1=""
-time_period_2=""
+date=int
+t1=""
+t2=""
 # Open output file:
 outfile = open('/Users/nt/Documents/Darwin_project/output/ds.txt', 'w+')
 output_writer = csv.writer(outfile, delimiter = "\t")
@@ -64,7 +70,7 @@ for row in input_reader:
     if count <10 and count >1:
         
         fname = row[0]
-        date_sent = row[1]
+        date_sent = int(row[1])
         sender = row[2]
         receiver = row[3]
         letter_text = row[4]
@@ -73,7 +79,7 @@ for row in input_reader:
         if letter_text !="" and target_word in letter_text:
             
             sentences=sent_tokenize(letter_text)
-            
+             
             #to do: replace m r . with mr. and other titles  
             
             #for ch in ['D r .', 'M r .', 'M r']:
@@ -82,9 +88,11 @@ for row in input_reader:
             letter_text = letter_text.replace('D r .', 'Dr.')
             letter_text = letter_text.replace('M r .', 'Mr.')
             letter_text = letter_text.replace('M r', 'Mr.')
-            
-            
-            print(letter_text)
+            #letter_text = letter_text.replace('&', ' ')
+            letter_text = letter_text.replace('I', ' ')
+            letter_text = letter_text.replace('The', ' ')
+            #letter_text = letter_text.replace('"', ' ')
+            #print(letter_text)
             #prints 'Goodbye everyone. Say "Goodbye" to me!'
             
             if beyond_sentence_boundary == "yes":
@@ -92,74 +100,57 @@ for row in input_reader:
                 if lemmatize == "no":
                 
                     tokens = word_tokenize(letter_text)
+                    #remove punctuation
+                    tokenizer = RegexpTokenizer(r'\w+')
+                    tokens = tokenizer.tokenize(letter_text)
                     #print("tokens", str(tokens))
-                    #extract target word from the letters
                     #print(len(tokens))
-                    #show stop words
                     #print(stopWords)
-                    
                     #print(len(stopWords))
-                    #print tokens without stopwords
-                    
+                                      
                     #substract stopwords from tokens
                     for t in tokens:
                         if t not in stopWords:
-                            vocabulary.append(t)
-                    
-                    
-                    
+                            vocabulary.append(t)                                                                                      
                     #print(vocabulary)
                     #print(len(vocabulary))
-                    #to do: loop over the list of tokens by index and find the index of the target word
-                    index_target_word=vocabulary.index(target_word)
                     
+                    #find the index of the target word
+                    index_target_word=vocabulary.index(target_word)
                     #print(str(index_target_word))
                     
                     #to do: define the range for the left and right context of the target word
-                    #print(vocabulary[index_target_word-win_size+1:index_target_word])
+                    #print(vocabulary[index_target_word-win_size+1:index_target_word][0])
                     #print(vocabulary[index_target_word+1:index_target_word+win_size])
                     
                          #to do: extract all words in the left and right context of the target word
                          #to do: add these words to the vocabulary list 
                     vocabulary=((vocabulary[index_target_word-win_size+1:index_target_word]),vocabulary[index_target_word+1:index_target_word+win_size])
+                    print(vocabulary)
                     
-                    
-                    
-                
                     print("Letter_ID:", fname)
                     print("context words:", vocabulary)
                     print("date:", date_sent)  
                     
                     #to do: check the date of the letter (date_sent) and see whether it is contained in t1 or t2
                     
-                    
-                    
+                    #to do: if the date of the letter is contained in t1 then add context words to the list context_word_t1 and if it's in t2 , do the same thing                        
                     if date_sent in time_period_1:
+                                    #range(1823, 1858)
                         print("t1:", "yes")
+                        context_words_t1.append(target_word)
+                        print(context_words_t1)
                     else: print("t1:", "no")
+
                         
                     if date_sent in time_period_2:
                         print("t2:", "yes")
+                        context_words_t2.append(target_word)
                     else: print("t2:", "no")
+                  
+            #is this necessary?      
+            #to do: if the date of the letter is contained in t1 then add context words to the list context_word_t1 and if it's in t2 , do the same thing    
                         
-                     
-                    
-                    #to do: if the date of the letter is contained in t1 then 
-                    #add context words to the list context_word_t1 and if it's in t2 , do the same thing    
-                    
-                    
-                    
-                    
-                    #To do: find adjustment for when the window of the target word is smaller than window size                   
-                               
-                   
-                    
-                               
-                      
-                    
-                    
-                    
-                    
                     
                     #to do: if the date of the letter is contained in t1, for every context word define the dictionary context_word_freq_t1 with key as the context word and value as the frequency
                         #if 'nature' is a context word then do context_word_freq_t1['nature']=1

@@ -17,7 +17,7 @@ pd.interval_range(start='1823-01-01', end='1858-01-01')
 #data = pd.date_range([0, 1, 2, 3], index=index)
 #print(data)
 
-'''#define parameters
+#define parameters
 target_word="identity"
 time_period_1=[1823,1858]
 time_period_2=[1859,1882]
