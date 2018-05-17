@@ -39,8 +39,7 @@ vocabulary=[]
 #define stopwords
 stopWords = set(stopwords.words('english'))
 #define context words of target one in time_period_1 & 2
-context_words_t1=[] #list of all context words of target word in t1
-context_words_t2=[] #list of all context words of target word in t2
+
 context_word_freq_t1=dict() #frequency of context word in t1 
 context_word_freq_t2=dict() #frequency of context word in t2
 #initialize word vector for target word in t1 and t2
@@ -52,12 +51,13 @@ Transcription='/Users/nt/Documents/Darwin_project/output/all_fields_10.txt'
 Letter_ID =""                    
 date=int
 t1=""
+context_words_t1=[] #list of all context words of target word in t1
 t2=""
-
+context_words_t2=[] #list of all context words of target word in t2
 # Open output file:
 outfile = open('/Users/nt/Documents/Darwin_project/output/ds.txt', 'w+')
 output_writer = csv.writer(outfile, delimiter = "\t")
-output_writer.writerow(["Letter_ID","context words","date","t1", "t2"])
+output_writer.writerow(["Letter_ID","context words","date","t1","context_words_t1", "t2","context_words_t2"])
 # Read input file:
 infile = open(Transcription, 'r+', encoding='utf-8')
 input_reader = csv.reader(infile, delimiter = "\t")
@@ -136,18 +136,25 @@ for row in input_reader:
                                     #range(1823, 1858)
                         print("t1:", "yes")
                         context_words_t1.append(target_word)
-                        print("context_word_t1:",context_words_t1)
+                        print("context_words_t1:",context_words_t1)
                     else: print("t1:", "no")
-
+                    
+                        
                         
                     if date_sent in time_period_2:
                         print("t2:", "yes")
                         context_words_t2.append(target_word)
+                        print("context_words_t2:",context_words_t2)
                     else: print("t2:", "no")
                   
                 
-              
-                        
+                    context_word_freq_t1['evolution'] = 1
+                    context_word_freq_t1['species'] = 1
+                    context_word_freq_t1['selection'] = 1
+                    
+                    print(context_word_freq_t1)
+                    
+                     
                     
                     #to do: if the date of the letter is contained in t1, for every context word define the dictionary context_word_freq_t1 with key as the context word and value as the frequency
                         #if 'nature' is a context word then do context_word_freq_t1['nature']=1
@@ -155,17 +162,17 @@ for row in input_reader:
                     
 
 #extract word vectors for target word in t1 and t2       
-#for word in vocabulary:
-#   if word in context_words_t1:
-#       target_word_t1.append(context_word_freq_t1[word])
-#   elif word in context_words_t2:
-#       target_word_t2.append(context_word_freq_t2[word])   
-
-#calculate cosine distance between word vectors for t1 and t2
-
-#cosine_distance = 1 - spatial.distance.cosine(target_word_t1, target_word_t2)     
-#print('cosine_distance', str(cosine_distance))
-             
+                    for word in vocabulary:
+                       if word in context_words_t1:
+                           target_word_t1.append(context_word_freq_t1[word])
+                       elif word in context_words_t2:
+                           target_word_t2.append(context_word_freq_t2[word])   
+                    
+                    #calculate cosine distance between word vectors for t1 and t2
+                    
+                    cosine_distance = 1 - spatial.distance.cosine(target_word_t1, target_word_t2)     
+                    print('cosine_distance', str(cosine_distance))
+                                 
                         
                         
                         
