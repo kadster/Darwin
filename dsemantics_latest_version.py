@@ -52,7 +52,9 @@ Transcription='/Users/nt/Documents/Darwin_project/output/all_fields_10.txt'
 Letter_ID =""                    
 date=int
 t1=""
+context_words_t1:""
 t2=""
+context_words_t2:""
 # Open output file:
 outfile = open('/Users/nt/Documents/Darwin_project/output/ds.txt', 'w+')
 output_writer = csv.writer(outfile, delimiter = "\t")
@@ -88,16 +90,8 @@ for row in input_reader:
 
             for i in range(len(old_titles)):
                 letter_text = letter_text.replace(old_titles[i],new_titles[i])
-            
-            '''letter_text = letter_text.replace('D r .', 'Dr.')
-            letter_text = letter_text.replace('M r .', 'Mr.')
-            letter_text = letter_text.replace('M r', 'Mr.')
-            #letter_text = letter_text.replace('&', ' ')
-            letter_text = letter_text.replace('I', ' ')
-            letter_text = letter_text.replace('The', ' ')
-            #letter_text = letter_text.replace('"', ' ')'''
             #print(letter_text)
-            #prints 'Goodbye everyone. Say "Goodbye" to me!'
+           
             
             if beyond_sentence_boundary == "yes":
                 #tokenize letter_text
@@ -152,8 +146,8 @@ for row in input_reader:
                         context_words_t2.append(target_word)
                     else: print("t2:", "no")
                   
-            #is this necessary?      
-            #to do: if the date of the letter is contained in t1 then add context words to the list context_word_t1 and if it's in t2 , do the same thing    
+                
+              
                         
                     
                     #to do: if the date of the letter is contained in t1, for every context word define the dictionary context_word_freq_t1 with key as the context word and value as the frequency
@@ -189,6 +183,6 @@ for row in input_reader:
         
 #model['identity']
     
-                output_writer.writerow([fname, vocabulary, date_sent, t1, t2]) 
+                output_writer.writerow([fname, vocabulary, date_sent, t1, context_words_t1, t2, context_word_t2]) 
 
 infile.close()
