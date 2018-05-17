@@ -52,9 +52,8 @@ Transcription='/Users/nt/Documents/Darwin_project/output/all_fields_10.txt'
 Letter_ID =""                    
 date=int
 t1=""
-context_words_t1:""
 t2=""
-context_words_t2:""
+
 # Open output file:
 outfile = open('/Users/nt/Documents/Darwin_project/output/ds.txt', 'w+')
 output_writer = csv.writer(outfile, delimiter = "\t")
@@ -183,6 +182,6 @@ for row in input_reader:
         
 #model['identity']
     
-                output_writer.writerow([fname, vocabulary, date_sent, t1, context_words_t1, t2, context_word_t2]) 
+                output_writer.writerow([fname, vocabulary, date_sent, t1, context_words_t1, t2, context_words_t2]) 
 
 infile.close()
