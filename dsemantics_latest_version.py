@@ -13,7 +13,7 @@ import csv
 from scipy import spatial    
 
 #define parameters
-target_word="evolution"
+target_word="British"
 #define time intervals
 time_period_1=list(range(1807,1858))
 time_period_2=list(range(1859,1882))
@@ -36,7 +36,7 @@ context_word_freq_t2=dict() #frequency of context word in t2
 target_word_t1=[]
 target_word_t2=[]
 #define file names
-Transcription='/Users/nt/Documents/Darwin_project/output/Book1.txt'
+Transcription='/Users/nt/Documents/Darwin_project/output/final.txt'
 # All the strings for output:
 Letter_ID =""                    
 date=int
@@ -47,18 +47,17 @@ context_words_t2=[] #list of all context words of target word in t2
 # Open output file:
 outfile = open('/Users/nt/Documents/Darwin_project/output/more_text.txt', 'w+')
 output_writer = csv.writer(outfile, delimiter = "\t")
-output_writer.writerow(["Letter_ID","context words","date","context_voc","t1","context_words_t1", "t2","context_words_t2"])
+output_writer.writerow(["Letter_ID","date","context words","context_voc","t1","context_words_t1", "t2","context_words_t2"])
 # Read input file:
 infile = open(Transcription, 'r+', encoding='utf-8')
 input_reader = csv.reader(infile, delimiter = "\t")
 output_strs = []
 
-
 #all_sentences=[]
 count=0
 for row in input_reader:
     count+=1
-    if count <100 and count >1:
+    if count <8000 and count >1:
         
         fname = row[0]
         date_sent = int(row[1])
@@ -68,21 +67,16 @@ for row in input_reader:
         #print("start"+letter_text+"end")
         context_voc=[]
         vocabulary=[]
-        if target_word in letter_text:
-            
+        if target_word in letter_text:            
             sentences=sent_tokenize(letter_text)
              
-            #to do: replace m r . with mr. and other titles  
-            
-           
+            #to do: replace m r . with mr. and other titles                         
             old_titles = ('D r .', 'M r .', 'M r', 'I', 'The')
             new_titles = ('Dr.', 'Mr.', 'Mr.', '', '')
 
             for i in range(len(old_titles)):
                 letter_text = letter_text.replace(old_titles[i],new_titles[i])
-            #print(letter_text)
-           
-            
+            #print(letter_text)                       
             if beyond_sentence_boundary == "yes":
                 #tokenize letter_text
                 if lemmatize == "no":
@@ -120,6 +114,7 @@ for row in input_reader:
                     print("context words:", context_voc)
                     print("date:", date_sent)  
                     
+                    
                     #to do: check the date of the letter (date_sent) and see whether it is contained in t1 or t2
                     
                     #to do: if the date of the letter is contained in t1 then add context words to the list context_word_t1 and if it's in t2 , do the same thing                        
@@ -130,9 +125,7 @@ for row in input_reader:
                             context_words_t1.append(word)
                         print("context_words_t1:",context_words_t1)
                     else: print("t1:", "no")
-                    
-                        
-                        
+                                            
                     if date_sent in time_period_2:
                         print("t2:", "yes")
                         for word in context_voc:
@@ -144,17 +137,16 @@ for row in input_reader:
                         #if 'nature' is a context word then do context_word_freq_t1['nature']=1
                         #for now all frequencies will be 1, next time discuss how to deal with frequencies greater than 1
                         
-                    for context_word in context_words_t1:
-                        context_word_freq_t1[context_word] = 1
+                    #for context_word in context_words_t1:
+                     #   context_word_freq_t1[context_word] = 1
                         
-                    for context_word in context_words_t2:
-                        context_word_freq_t2[context_word] = 1
+                    #for context_word in context_words_t2:
+                     #   context_word_freq_t2[context_word] = 1
                     
                     
                     #print(context_word_freq_t1)
                     
-                    
-                    
+                                        
                    #extract word vectors for target word in t1 and t2       
 #                     for word in vocabulary:
 #                       if word in context_words_t1:
