@@ -21,7 +21,7 @@ from scipy import spatial
 
 #define parameters:
 
-target_word = "brain"
+target_word = "creation"
 #define time intervals
 #date_t1_1=1823
 #date_t1_2=1858
