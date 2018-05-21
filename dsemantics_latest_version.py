@@ -13,7 +13,7 @@ import csv
 from scipy import spatial    
 
 #define parameters
-target_word="British"
+target_word="species"
 #define time intervals
 time_period_1=list(range(1807,1858))
 time_period_2=list(range(1859,1882))
@@ -121,16 +121,16 @@ for row in input_reader:
                     if date_sent in time_period_1:
                                     #range(1823, 1858)
                         print("t1:", "yes")
-                        for word in context_voc:
-                            context_words_t1.append(word)
-                        print("context_words_t1:",context_words_t1)
+                   #     for word in context_voc:
+                   #         context_words_t1.append(word)
+                   #     print("context_words_t1:",context_words_t1)
                     else: print("t1:", "no")
                                             
                     if date_sent in time_period_2:
                         print("t2:", "yes")
-                        for word in context_voc:
-                            context_words_t2.append(word)
-                        print("context_words_t2:",context_words_t2)
+                  #      for word in context_voc:
+                  #          context_words_t2.append(word)
+                  #      print("context_words_t2:",context_words_t2)
                     else: print("t2:", "no")
                   
                     #to do: if the date of the letter is contained in t1, for every context word define the dictionary context_word_freq_t1 with key as the context word and value as the frequency

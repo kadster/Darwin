@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Apr 26 12:00:58 2018
+Created on Fri May 18 14:36:03 2018
 
+@author: nt
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Apr 26 12:00:58 2018
 @author: nt
 """
 #import modules
@@ -21,7 +28,7 @@ from scipy import spatial
 
 #define parameters:
 
-target_word = "creation"
+target_word = "evolution"
 #define time intervals
 #date_t1_1=1823
 #date_t1_2=1858
@@ -39,7 +46,7 @@ lemmatize = "no"
 
 #define file names:
 
-Transcription='/Users/nt/Documents/Darwin_project/output/all_fields_10.txt'
+Transcription='/Users/nt/Documents/Darwin_project/output/final.txt'
 outfile1_name =  '/Users/nt/Documents/Darwin_project/output/letters_context_words_'+target_word+'_winsize'+ str(win_size)+'_beyond_sentence_boundary_'+beyond_sentence_boundary+'lemmatize'+lemmatize+'.csv'
 outfile2_name = '/Users/nt/Documents/Darwin_project/output/word_vectors_'+target_word+'_winsize'+ str(win_size)+'_beyond_sentence_boundary_'+beyond_sentence_boundary+'lemmatize'+lemmatize+'.txt'
 outfile3_name = '/Users/nt/Documents/Darwin_project/output/cosine_distance_word_vectors_'+target_word+'_winsize'+ str(win_size)+'_beyond_sentence_boundary_'+beyond_sentence_boundary+'lemmatize'+lemmatize+'.txt'
@@ -344,4 +351,3 @@ print('cosine_distance', str(cosine_distance))
 outfile3 = open(outfile3_file, 'w+')
 outfile3.write(cosine_distance)
 outfile3.close()
-

@@ -10,43 +10,30 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 import csv
-from scipy import spatial
-#import re
-#import pandas as pd
-#pd.interval_range(start='1823-01-01', end='1858-01-01')
-#time_period_1= pd.interval_range#
-#print(time_period_1)
-#data = pd.date_range([0, 1, 2, 3], index=index)
-#print(data)       
+from scipy import spatial    
 
-#define parameters:
-
-target_word = "creation"
+#define parameters
+target_word="British"
 #define time intervals
-#date_t1_1=1823
-#date_t1_2=1858
-
-time_period_1 = list(range(1823,1858))
-time_period_2 = list(range(1859,1882))
-
+time_period_1=list(range(1807,1858))
+time_period_2=list(range(1859,1882))
 #define window size
-win_size = 3
+win_size= 3
 #context words occurring with target word go beyond sentence boundary
-beyond_sentence_boundary = "yes"
+beyond_sentence_boundary="yes"
 #lemmatize yes or no
-lemmatize = "no"
+lemmatize="no"
+#define vocabulary
 
 
-#define file names:
-
-Transcription='/Users/nt/Documents/Darwin_project/output/all_fields_10.txt'
-outfile1_name =  '/Users/nt/Documents/Darwin_project/output/letters_context_words_'+target_word+'_winsize'+ str(win_size)+'_beyond_sentence_boundary_'+beyond_sentence_boundary+'lemmatize'+lemmatize+'.csv'
-outfile2_name = '/Users/nt/Documents/Darwin_project/output/word_vectors_'+target_word+'_winsize'+ str(win_size)+'_beyond_sentence_boundary_'+beyond_sentence_boundary+'lemmatize'+lemmatize+'.txt'
-outfile3_name = '/Users/nt/Documents/Darwin_project/output/cosine_distance_word_vectors_'+target_word+'_winsize'+ str(win_size)+'_beyond_sentence_boundary_'+beyond_sentence_boundary+'lemmatize'+lemmatize+'.txt'
+#define stopwords
+stopWords = set(stopwords.words('english'))
+#define context words of target one in time_period_1 & 2
 
 
-#define vocabulary, which is a dictionary whose keys are all context words of the target_word and whose values are their
-# frequency of their co-occurrence with the target_word:
+#define file names
+Transcription='/Users/nt/Documents/Darwin_project/output/final.txt'
+outfile =  '/Users/nt/Documents/Darwin_project/output/letters_context_words_'+target_word+'_winsize'+ str(win_size)+'_beyond_sentence_boundary_'+beyond_sentence_boundary+'lemmatize'+lemmatize+'.csv'
 vocabulary = dict()
 
 
@@ -61,15 +48,12 @@ target_word_t2 = [] # this is the word vector for target_word in t2; it contains
 context_words_t1 = [] #dictionary of all context words of target word in t1; its keys are the context words and its values are
 # the frequency with which the context words appear with the target word in t1
 context_words_t2 = [] #dictionary of all context words of target word in t2; its keys are the context words and its values are
-# the frequency with which the context words appear with the target word in t2
-
-
-# define stopwords:
+# the frequency with which the 
+#outfile = open('/Users/nt/Documents/Darwin_project/output/more_text.txt', 'w+')
 
 stopWords = set(stopwords.words('english'))
 
-# Open output1 file, which contains the list of context words of target_word in each letter:
-outfile1 = open(outfile1_file, 'w+')
+outfile = open(outfile1_file, 'w+')
 
 output_writer1 = csv.writer(outfile1_name, delimiter = "\t")
 
@@ -83,11 +67,11 @@ output_writer1.writerow(["Letter_ID","date", "left or right context", "Context w
 infile = open(Transcription, 'r+', encoding='utf-8')
 input_reader = csv.reader(infile, delimiter = "\t")
 
-
+#all_sentences=[]
 count=0
 for row in input_reader:
     count+=1
-    if count <10 and count >1:
+    if count <8000 and count >1:
         
         fname = row[0]
         date_sent = int(row[1])
@@ -95,30 +79,23 @@ for row in input_reader:
         receiver = row[3]
         letter_text = row[4]
         #print("start"+letter_text+"end")
-        
-        if letter_text !="" and target_word in letter_text:
-            
+        context_voc=[]
+        vocabulary=[]
+        if target_word in letter_text:            
             sentences=sent_tokenize(letter_text)
              
-            #to do: replace m r . with mr. and other titles  
-            
-           
+            #to do: replace m r . with mr. and other titles                         
             old_titles = ('D r .', 'M r .', 'M r', 'I', 'The')
             new_titles = ('Dr.', 'Mr.', 'Mr.', '', '')
 
             for i in range(len(old_titles)):
                 letter_text = letter_text.replace(old_titles[i],new_titles[i])
-            #print(letter_text)
-           
-            
+            #print(letter_text)                       
             if beyond_sentence_boundary == "yes":
-
-                #tokenize letter_text:
-
+                #tokenize letter_text
                 if lemmatize == "no":
                 
                     tokens = word_tokenize(letter_text)
-
                     #remove punctuation
                     tokenizer = RegexpTokenizer(r'\w+')
                     tokens = tokenizer.tokenize(letter_text)
@@ -127,14 +104,13 @@ for row in input_reader:
                     #print(stopWords)
                     #print(len(stopWords))
                                       
-                    #substract stopwords from tokens:
-
+                    #substract stopwords from tokens
                     for t in tokens:
                         if t not in stopWords:
                             vocabulary.append(t)                                                                                      
                     #print(vocabulary)
                     #print(len(vocabulary))
-
+                    
                     # initialize the list of left context words of all occurrences of the target_word in this letter:
 
                     left_context = list()
@@ -172,7 +148,7 @@ for row in input_reader:
 
                             # write context words in output file1:
 
-                            output_writer1.writerow([fname, date_sent, "left", left_context_word])
+                            output_writer.writerow([fname, date_sent, "left", left_context_word])
 
                         # tokens[index_target_word+1:index_target_word+win_size+1] # this covers the right context of
                         # target_word
@@ -182,12 +158,12 @@ for row in input_reader:
 
                         # add the right context words of this occurrence of target_word (indexed by index_target_word)
                         # to right_context:
-                        for right_context_word in right_context_this_index:
+                        for right_context_word in right_context:
                             right_context.append(right_context_word)
 
                             # write context words in output file1:
 
-                            output_writer1.writerow([fname, date_sent, "right", right_context_word])
+                            output_writer.writerow([fname, date_sent, "right", right_context_word])
 
                         # add left context words to the vocabulary:
 
@@ -283,65 +259,7 @@ for row in input_reader:
                     else:
                         print("t2:", "the letter was not written in t2")
 
-outfile1.close()
+
+    
+outfile.close()
 infile.close()
-
-# define word vectors for target word in t1 and t2:
-
-for word in vocabulary: # loop over all words in the vocabulary
-
-    # if the word appears in a context for target_word in t1:
-
-    if word in context_words_t1:
-
-        # add the frequency with which target_word occurs with word:
-        target_word_t1.append(context_word_freq_t1[word])
-    else:
-        # if word isn't a context word for target_word in t1, add 0:
-        target_word_t1.append(0)
-
-    if word in context_words_t2:
-        # add the frequency with which target_word occurs with word:
-        target_word_t2.append(context_word_freq_t2[word])
-    else:
-        # if word isn't a context word for target_word in t2, add 0:
-        target_word_t1.append(0)
-
-
-# Open output2 file, which contains the vectors of target_word for t1 and t2:
-
-outfile2 = open(outfile2_file, 'w+')
-
-# print the list of all words in the vocabulary:
-
-for word in vocabulary:
-
-    outfile2.write(word + "\t")
-
-# print the list of all elements of the word vector for target_word in t1:
-
-for context_word_t1 in target_word_t1:
-    outfile2.write(context_words_t1 + "\t")
-
-outfile2.write("\n")
-
-# print the list of all elements of the word vector for target_word in t2:
-
-for context_word_t2 in target_word_t2:
-    outfile2.write(context_words_t2 + "\t")
-
-outfile2.write("\n")
-
-outfile2.close()
-
-#calculate cosine distance between word vector for target_word in t1 and word vector for target_word in t2:
-                    
-cosine_distance = 1 - spatial.distance.cosine(target_word_t1, target_word_t2)
-print('cosine_distance', str(cosine_distance))
-
-# print cosine distance to third output file:
-
-outfile3 = open(outfile3_file, 'w+')
-outfile3.write(cosine_distance)
-outfile3.close()
-
