@@ -21,7 +21,7 @@ from scipy import spatial
 
 #define parameters:
 
-target_word = "creation"
+target_word = "worker"
 #define time intervals
 #date_t1_1=1823
 #date_t1_2=1858
@@ -39,7 +39,7 @@ lemmatize = "no"
 
 #define file names:
 
-Transcription = '/Users/bmcgillivray/GitHub/Darwin/all_fields_10.txt'
+Transcription = '/Users/bmcgillivray/GitHub/Darwin/finalfinal.txt'
 outfile1_name = '/Users/bmcgillivray/GitHub/Darwin/letters_context_words_'+target_word+'_winsize-'+ str(win_size)+\
                 '_beyond_sentence_boundary-'+beyond_sentence_boundary+'lemmatize-'+lemmatize+'.csv'
 outfile2_name = '/Users/bmcgillivray/GitHub/Darwin/word_vectors_'+target_word+'_winsize-'+ str(win_size)+\
@@ -51,7 +51,7 @@ outfile3_name = '/Users/bmcgillivray/GitHub/Darwin/cosine_distance_word_vectors_
 #define vocabulary, which is a dictionary whose keys are all context words of the target_word and whose values are their
 # frequency of their co-occurrence with the target_word:
 vocabulary = dict()
-
+vocabulary_list = [] # this is the list of all vocabulary words
 
 #initialize word vector for target word in t1 and t2
 target_word_t1 = [] # this is the word vector for target_word in t1; it contains the list of frequencies of co-occurrence
@@ -85,20 +85,21 @@ infile = open(Transcription, 'r+', encoding='utf-8')
 input_reader = csv.reader(infile, delimiter = "\t")
 
 
-count=0
+count = 0
 for row in input_reader:
-    count+=1
-    if count <10 and count >1:
-        #print(str(row))
+    count += 1
+    if count >1 and count < 5477: # 5477 is the maximum number of lines
+        print(str(count))
         fname = row[0]
         date_sent = int(row[1])
         sender = row[2]
         receiver = row[3]
         letter_text = row[4]
-        print(letter_text)
+        #print(letter_text)
         
-        if letter_text !="" and target_word in letter_text:
-            
+        if letter_text != "" and target_word in letter_text:
+
+            letter_text = letter_text.lower()
             sentences=sent_tokenize(letter_text)
              
             #to do: replace m r . with mr. and other titles  
@@ -170,6 +171,7 @@ for row in input_reader:
                         # to left_context:
                         for left_context_word in left_context_this_index:
                             if left_context_word not in stopWords:
+
                                 left_context.append(left_context_word)
 
                                 # write context words in output file1:
@@ -197,12 +199,14 @@ for row in input_reader:
 
                         for left_context_word in left_context:
                             if left_context_word not in stopWords:
+                                vocabulary_list.append(left_context_word)
                                 if left_context_word in vocabulary:
                                     frequency = vocabulary[left_context_word] # this is the frequency of
                                     # left_context_word as counted so far
                                     frequency += 1 # add 1 to the frequency of left_context_word to account for this
                                     # occurrence of left_context_word with target_word
                                     vocabulary[left_context_word] = frequency
+
                                 else:
                                     vocabulary[left_context_word] = 1
 
@@ -210,6 +214,7 @@ for row in input_reader:
 
                         for right_context_word in right_context:
                             if right_context_word not in stopWords:
+                                vocabulary_list.append(right_context_word)
                                 if right_context_word in vocabulary:
                                     frequency = vocabulary[right_context_word] # this is the frequency of
                                     # right_context_word as counted so far
@@ -221,10 +226,10 @@ for row in input_reader:
 
                     #print(vocabulary)
                     
-                    print("Letter_ID:", fname)
-                    print("left context words:", left_context)
+                    #print("Letter_ID:", fname)
+                    #print("left context words:", left_context)
 
-                    print("date:", date_sent)  
+                    #print("date:", date_sent)
                     
                     #check the date of the letter (date_sent) and see whether it is contained in t1 or t2
                     
@@ -232,7 +237,7 @@ for row in input_reader:
                     # and if it's in t2 ,  add context words to context_word_t2:
 
                     if date_sent in time_period_1:
-                        print("the letter was written in t1")
+                        #print("the letter was written in t1")
 
                         # record frequency of left context words in t1 letters:
 
@@ -244,7 +249,7 @@ for row in input_reader:
                             else:
                                 context_words_t1[left_context_word] = 1
 
-                        print("context_words_t1:",context_words_t1)
+                        #print("context_words_t1:",context_words_t1)
 
                         # record frequency of right context words in t1 letters:
 
@@ -256,12 +261,13 @@ for row in input_reader:
                             else:
                                 context_words_t1[right_context_word] = 1
 
-                    else:
-                        print("the letter was not written in t1")
+
+                    #else:
+                        #print("the letter was not written in t1")
 
                         
                     if date_sent in time_period_2:
-                        print("the letter was written in t2")
+                        #print("the letter was written in t2")
 
                         # record frequency of left context words in t1 letters:
 
@@ -273,7 +279,7 @@ for row in input_reader:
                             else:
                                 context_words_t2[left_context_word] = 1
 
-                        print("context_words_t2:", context_words_t2)
+                        #print("context_words_t2:", context_words_t2)
 
                         # record frequency of right context words in t2 letters:
 
@@ -285,22 +291,27 @@ for row in input_reader:
                             else:
                                 context_words_t2[right_context_word] = 1
 
-                    else:
-                        print("the letter was not written in t2")
+                    #else:
+                        #print("the letter was not written in t2")
 
 outfile1.close()
 infile.close()
 
 # define word vectors for target word in t1 and t2:
+index = 0
 
-for word in vocabulary: # loop over all words in the vocabulary
+vocabulary_list = list(set(vocabulary_list)) # I eliminate duplicates
 
+for i in range(len(vocabulary_list)): # loop over all words in the vocabulary
+
+    word = vocabulary_list[i]
+    #print(word)
     # if the word appears in a context for target_word in t1:
-
     if word in context_words_t1:
 
         # add the frequency with which target_word occurs with word:
         target_word_t1.append(context_words_t1[word])
+
     else:
         # if word isn't a context word for target_word in t1, add 0:
         target_word_t1.append(0)
@@ -310,7 +321,8 @@ for word in vocabulary: # loop over all words in the vocabulary
         target_word_t2.append(context_words_t2[word])
     else:
         # if word isn't a context word for target_word in t2, add 0:
-        target_word_t1.append(0)
+        target_word_t2.append(0)
+
 
 
 # Open output2 file, which contains the vectors of target_word for t1 and t2:
@@ -349,6 +361,6 @@ print('cosine_distance', str(cosine_distance))
 # print cosine distance to third output file:
 
 outfile3 = open(outfile3_name, 'w+')
-outfile3.write(cosine_distance)
+outfile3.write(str(cosine_distance))
 outfile3.close()
 
