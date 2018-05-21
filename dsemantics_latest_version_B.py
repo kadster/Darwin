@@ -39,10 +39,13 @@ lemmatize = "no"
 
 #define file names:
 
-Transcription='/Users/nt/Documents/Darwin_project/output/all_fields_10.txt'
-outfile1_name =  '/Users/nt/Documents/Darwin_project/output/letters_context_words_'+target_word+'_winsize'+ str(win_size)+'_beyond_sentence_boundary_'+beyond_sentence_boundary+'lemmatize'+lemmatize+'.csv'
-outfile2_name = '/Users/nt/Documents/Darwin_project/output/word_vectors_'+target_word+'_winsize'+ str(win_size)+'_beyond_sentence_boundary_'+beyond_sentence_boundary+'lemmatize'+lemmatize+'.txt'
-outfile3_name = '/Users/nt/Documents/Darwin_project/output/cosine_distance_word_vectors_'+target_word+'_winsize'+ str(win_size)+'_beyond_sentence_boundary_'+beyond_sentence_boundary+'lemmatize'+lemmatize+'.txt'
+Transcription = '/Users/bmcgillivray/GitHub/Darwin/all_fields_10.txt'
+outfile1_name = '/Users/bmcgillivray/GitHub/Darwin/letters_context_words_'+target_word+'_winsize-'+ str(win_size)+\
+                '_beyond_sentence_boundary-'+beyond_sentence_boundary+'lemmatize-'+lemmatize+'.csv'
+outfile2_name = '/Users/bmcgillivray/GitHub/Darwin/word_vectors_'+target_word+'_winsize-'+ str(win_size)+\
+                '_beyond_sentence_boundary-'+beyond_sentence_boundary+'lemmatize-'+lemmatize+'.txt'
+outfile3_name = '/Users/bmcgillivray/GitHub/Darwin/cosine_distance_word_vectors_'+target_word+'_winsize-'+ \
+                str(win_size)+'_beyond_sentence_boundary-'+beyond_sentence_boundary+'lemmatize-'+lemmatize+'.txt'
 
 
 #define vocabulary, which is a dictionary whose keys are all context words of the target_word and whose values are their
@@ -50,17 +53,15 @@ outfile3_name = '/Users/nt/Documents/Darwin_project/output/cosine_distance_word_
 vocabulary = dict()
 
 
-context_word_freq_t1 = dict() #frequency of context word in t1
-context_word_freq_t2 = dict() #frequency of context word in t2
 #initialize word vector for target word in t1 and t2
 target_word_t1 = [] # this is the word vector for target_word in t1; it contains the list of frequencies of co-occurrence
 # of context words for target_word in t1; its entries correspond to all vocabulary words
 target_word_t2 = [] # this is the word vector for target_word in t2; it contains the list of frequencies of co-occurrence
 # of context words for target_word in t2; its entries correspond to all vocabulary words
 
-context_words_t1 = [] #dictionary of all context words of target word in t1; its keys are the context words and its values are
+context_words_t1 = dict() #dictionary of all context words of target word in t1; its keys are the context words and its values are
 # the frequency with which the context words appear with the target word in t1
-context_words_t2 = [] #dictionary of all context words of target word in t2; its keys are the context words and its values are
+context_words_t2 = dict() #dictionary of all context words of target word in t2; its keys are the context words and its values are
 # the frequency with which the context words appear with the target word in t2
 
 
@@ -69,9 +70,9 @@ context_words_t2 = [] #dictionary of all context words of target word in t2; its
 stopWords = set(stopwords.words('english'))
 
 # Open output1 file, which contains the list of context words of target_word in each letter:
-outfile1 = open(outfile1_file, 'w+')
+outfile1 = open(outfile1_name, 'w+')
 
-output_writer1 = csv.writer(outfile1_name, delimiter = "\t")
+output_writer1 = csv.writer(outfile1, delimiter = "\t")
 
 # write first line of output file 1:
 
@@ -88,13 +89,13 @@ count=0
 for row in input_reader:
     count+=1
     if count <10 and count >1:
-        
+        #print(str(row))
         fname = row[0]
         date_sent = int(row[1])
         sender = row[2]
         receiver = row[3]
         letter_text = row[4]
-        #print("start"+letter_text+"end")
+        print(letter_text)
         
         if letter_text !="" and target_word in letter_text:
             
@@ -129,9 +130,9 @@ for row in input_reader:
                                       
                     #substract stopwords from tokens:
 
-                    for t in tokens:
-                        if t not in stopWords:
-                            vocabulary.append(t)                                                                                      
+                    #for t in tokens:
+                    #    if t not in stopWords:
+                    #        vocabulary.append(t)
                     #print(vocabulary)
                     #print(len(vocabulary))
 
@@ -168,51 +169,55 @@ for row in input_reader:
                         # add the left context words of this occurrence of target_word (indexed by index_target_word)
                         # to left_context:
                         for left_context_word in left_context_this_index:
-                            left_context.append(left_context_word)
+                            if left_context_word not in stopWords:
+                                left_context.append(left_context_word)
 
-                            # write context words in output file1:
+                                # write context words in output file1:
 
-                            output_writer1.writerow([fname, date_sent, "left", left_context_word])
+                                output_writer1.writerow([fname, date_sent, "left", left_context_word])
 
                         # tokens[index_target_word+1:index_target_word+win_size+1] # this covers the right context of
                         # target_word
 
-                        right_context = tokens[index_target_word+1:index_target_word+win_size+1] # this
+                        right_context_this_index = tokens[index_target_word+1:index_target_word+win_size+1] # this
                         # is the list of all words occurring in the right context of this occurrence of the target_word
 
                         # add the right context words of this occurrence of target_word (indexed by index_target_word)
                         # to right_context:
+
                         for right_context_word in right_context_this_index:
-                            right_context.append(right_context_word)
+                            if right_context_word not in stopWords:
+                                right_context.append(right_context_word)
 
-                            # write context words in output file1:
+                                # write context words in output file1:
 
-                            output_writer1.writerow([fname, date_sent, "right", right_context_word])
+                                output_writer1.writerow([fname, date_sent, "right", right_context_word])
 
                         # add left context words to the vocabulary:
 
                         for left_context_word in left_context:
-
-                            if left_context_word in vocabulary:
-                                frequency = vocabulary[left_context_word] # this is the frequency of
-                                # left_context_word as counted so far
-                                frequency += 1 # add 1 to the frequency of left_context_word to account for this
-                                # occurrence of left_context_word with target_word
-                                vocabulary[left_context_word] = frequency
-                            else:
-                                vocabulary[left_context_word] = 1
+                            if left_context_word not in stopWords:
+                                if left_context_word in vocabulary:
+                                    frequency = vocabulary[left_context_word] # this is the frequency of
+                                    # left_context_word as counted so far
+                                    frequency += 1 # add 1 to the frequency of left_context_word to account for this
+                                    # occurrence of left_context_word with target_word
+                                    vocabulary[left_context_word] = frequency
+                                else:
+                                    vocabulary[left_context_word] = 1
 
                         # add right context words to the vocabulary:
 
                         for right_context_word in right_context:
-                            if right_context_word in vocabulary:
-                                frequency = vocabulary[right_context_word] # this is the frequency of
-                                # right_context_word as counted so far
-                                frequency += 1 # add 1 to the frequency of left_context_word to account for this
-                                # occurrence of right_context_word with target_word
-                                vocabulary[right_context_word] = frequency
-                            else:
-                                vocabulary[right_context_word] = 1
+                            if right_context_word not in stopWords:
+                                if right_context_word in vocabulary:
+                                    frequency = vocabulary[right_context_word] # this is the frequency of
+                                    # right_context_word as counted so far
+                                    frequency += 1 # add 1 to the frequency of left_context_word to account for this
+                                    # occurrence of right_context_word with target_word
+                                    vocabulary[right_context_word] = frequency
+                                else:
+                                    vocabulary[right_context_word] = 1
 
                     #print(vocabulary)
                     
@@ -227,7 +232,7 @@ for row in input_reader:
                     # and if it's in t2 ,  add context words to context_word_t2:
 
                     if date_sent in time_period_1:
-                        print("t1:", "the letter was written in t1")
+                        print("the letter was written in t1")
 
                         # record frequency of left context words in t1 letters:
 
@@ -252,11 +257,11 @@ for row in input_reader:
                                 context_words_t1[right_context_word] = 1
 
                     else:
-                        print("t1:", "the letter was not written in t1")
+                        print("the letter was not written in t1")
 
                         
                     if date_sent in time_period_2:
-                        print("t2:","the letter was written in t2")
+                        print("the letter was written in t2")
 
                         # record frequency of left context words in t1 letters:
 
@@ -281,7 +286,7 @@ for row in input_reader:
                                 context_words_t2[right_context_word] = 1
 
                     else:
-                        print("t2:", "the letter was not written in t2")
+                        print("the letter was not written in t2")
 
 outfile1.close()
 infile.close()
@@ -295,14 +300,14 @@ for word in vocabulary: # loop over all words in the vocabulary
     if word in context_words_t1:
 
         # add the frequency with which target_word occurs with word:
-        target_word_t1.append(context_word_freq_t1[word])
+        target_word_t1.append(context_words_t1[word])
     else:
         # if word isn't a context word for target_word in t1, add 0:
         target_word_t1.append(0)
 
     if word in context_words_t2:
         # add the frequency with which target_word occurs with word:
-        target_word_t2.append(context_word_freq_t2[word])
+        target_word_t2.append(context_words_t2[word])
     else:
         # if word isn't a context word for target_word in t2, add 0:
         target_word_t1.append(0)
@@ -310,7 +315,7 @@ for word in vocabulary: # loop over all words in the vocabulary
 
 # Open output2 file, which contains the vectors of target_word for t1 and t2:
 
-outfile2 = open(outfile2_file, 'w+')
+outfile2 = open(outfile2_name, 'w+')
 
 # print the list of all words in the vocabulary:
 
@@ -318,17 +323,19 @@ for word in vocabulary:
 
     outfile2.write(word + "\t")
 
+outfile2.write("\n")
+
 # print the list of all elements of the word vector for target_word in t1:
 
 for context_word_t1 in target_word_t1:
-    outfile2.write(context_words_t1 + "\t")
+    outfile2.write(str(context_word_t1) + "\t")
 
 outfile2.write("\n")
 
 # print the list of all elements of the word vector for target_word in t2:
 
 for context_word_t2 in target_word_t2:
-    outfile2.write(context_words_t2 + "\t")
+    outfile2.write(str(context_word_t2) + "\t")
 
 outfile2.write("\n")
 
@@ -341,7 +348,7 @@ print('cosine_distance', str(cosine_distance))
 
 # print cosine distance to third output file:
 
-outfile3 = open(outfile3_file, 'w+')
+outfile3 = open(outfile3_name, 'w+')
 outfile3.write(cosine_distance)
 outfile3.close()
 
